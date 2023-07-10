@@ -4,24 +4,116 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 BLUE = (0, 0, 255)
 
+# easy
+# [
+# [7, 9, 5, 2, 8, 0, 0, 0, 1],
+# [0, 0, 0, 9, 5, 4, 0, 8, 7],
+# [0, 0, 4, 3, 7, 0, 5, 0, 0],
+# [0, 0, 0, 8, 9, 2, 0, 5, 0],
+# [5, 1, 2, 0, 0, 0, 0, 0, 9],
+# [3, 0, 0, 0, 0, 7, 4, 0, 0],
+# [0, 0, 1, 0, 3, 8, 0, 2, 0],
+# [6, 3, 0, 0, 0, 9, 7, 0, 0],
+# [0, 4, 0, 0, 0, 5, 9, 3, 0],
+# ]
+
+# medium
+# [0, 0, 0, 0, 0, 0, 0, 0, 1],
+# [0, 0, 8, 0, 0, 0, 0, 0, 5],
+# [9, 0, 0, 6, 0, 5, 3, 7, 0],
+# [0, 0, 0, 0, 2, 6, 0, 4, 0],
+# [5, 0, 0, 0, 0, 9, 0, 0, 0],
+# [3, 0, 0, 0, 0, 0, 0, 0, 0],
+# [7, 0, 5, 0, 0, 0, 2, 0, 0],
+# [0, 0, 4, 8, 0, 0, 0, 0, 6],
+# [0, 1, 9, 7, 0, 0, 0, 0, 0],
+
 
 class Board:
-    def __init__(self, game):
+    def __init__(self, game, difficulty="easy"):
         self.game = game
         self.size = 630
         self.font = pg.font.SysFont("comicsans", 40)
         self.board_offset = (self.game.width - self.size) // 2
-        self.board = [
-            [5, 3, 0, 0, 7, 0, 0, 0, 0],
-            [6, 0, 0, 1, 9, 5, 0, 0, 0],
-            [0, 9, 8, 0, 0, 0, 0, 6, 0],
-            [8, 0, 0, 0, 6, 0, 0, 0, 3],
-            [4, 0, 0, 8, 0, 3, 0, 0, 1],
-            [7, 0, 0, 0, 2, 0, 0, 0, 6],
-            [0, 6, 0, 0, 0, 0, 2, 8, 0],
-            [0, 0, 0, 4, 1, 9, 0, 0, 5],
-            [0, 0, 0, 0, 8, 0, 0, 7, 9],
-        ]
+
+        if difficulty == "easy":
+            self.board = [
+                [7, 9, 5, 2, 8, 0, 0, 0, 1],
+                [0, 0, 0, 9, 5, 4, 0, 8, 7],
+                [0, 0, 4, 3, 7, 0, 5, 0, 0],
+                [0, 0, 0, 8, 9, 2, 0, 5, 0],
+                [5, 1, 2, 0, 0, 0, 0, 0, 9],
+                [3, 0, 0, 0, 0, 7, 4, 0, 0],
+                [0, 0, 1, 0, 3, 8, 0, 2, 0],
+                [6, 3, 0, 0, 0, 9, 7, 0, 0],
+                [0, 4, 0, 0, 0, 5, 9, 3, 0],
+            ]
+            self.delay = 100
+        elif difficulty == "medium":
+            self.board = [
+                [0, 0, 0, 0, 0, 0, 0, 0, 1],
+                [0, 0, 8, 0, 0, 0, 0, 0, 5],
+                [9, 0, 0, 6, 0, 5, 3, 7, 0],
+                [0, 0, 0, 0, 2, 6, 0, 4, 0],
+                [5, 0, 0, 0, 0, 9, 0, 0, 0],
+                [3, 0, 0, 0, 0, 0, 0, 0, 0],
+                [7, 0, 5, 0, 0, 0, 2, 0, 0],
+                [0, 0, 4, 8, 0, 0, 0, 0, 6],
+                [0, 1, 9, 7, 0, 0, 0, 0, 0],
+            ]
+            # with any delay, it takes a while to solve
+            self.delay = 0
+
+    # check if the number can be places in the row, col, or box
+    def valid_number(self, row, col, num):
+        for i in range(len(self.board)):
+            if self.board[row][i] == num:
+                return False
+
+            if self.board[i][col] == num:
+                return False
+
+        box_row = row // 3
+        box_col = col // 3
+
+        for i in range(box_row * 3, box_row * 3 + 3):
+            for j in range(box_col * 3, box_col * 3 + 3):
+                if self.board[i][j] == num:
+                    return False
+
+        return True
+
+    def solve(self):
+        # loop through every row and col
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                if self.board[i][j] == 0:
+                    # try every number from 1 to 9
+                    for num in range(1, 10):
+                        if self.valid_number(i, j, num):
+                            # if the number is valid, place it in the board
+                            self.board[i][j] = num
+
+                            # draw the board
+                            self.game.draw()
+                            pg.display.update()
+                            pg.time.delay(self.delay)
+
+                            # recursively call solve
+                            if self.solve():
+                                return True
+
+                            # if solve returns false, reset the number
+                            self.board[i][j] = 0
+
+                            # draw the board
+                            self.game.draw()
+                            pg.display.update()
+                            pg.time.delay(self.delay)
+
+                    return False
+
+        return True
 
     def draw(self):
         box_size = self.size // 9
