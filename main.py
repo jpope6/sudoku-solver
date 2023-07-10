@@ -16,7 +16,7 @@ class Game:
         self.clock = pg.time.Clock()
 
         # Change the difficulty to get different boards here
-        self.board = Board(self, difficulty="medium")
+        self.board = Board(self, difficulty="easy")
 
         self.surface = pg.Surface((self.board.size, self.board.size))
 

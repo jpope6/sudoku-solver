@@ -2,7 +2,7 @@ import pygame as pg
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
 
 
 class Board:
@@ -103,7 +103,7 @@ class Board:
 
                 pg.draw.rect(
                     self.game.surface,
-                    WHITE if self.board[i][j] == 0 else BLUE,
+                    WHITE if self.board[i][j] == 0 else GREEN,
                     (x, y, box_size, box_size),
                 )
 
